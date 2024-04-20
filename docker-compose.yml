@@ -1,0 +1,54 @@
+version: "3.8"
+services:
+  tempo:
+    networks:
+      - telemetry
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo/config.yaml:/etc/tempo.yaml
+      - ./tempo-data:/tmp/tempo
+    ports:
+      - 14268:14268  # jaeger ingest
+      - 3200:3200    # tempo
+      - 4317:4317    # otlp grpc
+      - 4318:4318    # otlp http
+      - 9411:9411    # zipkin
+  grafana:
+    networks:
+      - telemetry
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    ports:
+      - 3000:3000
+  mimir:
+    networks:
+      - telemetry
+    image: grafana/mimir:latest
+    container_name: mimir
+    ports:
+      - 9009:9009
+      - 8080:7007
+    volumes:
+      - ./mimir/config.yaml:/etc/mimir/config.yaml
+    command:
+      - run
+      - --config.file=/etc/mimir/config.yaml
+  # Grafana Agent/Promethus (scraper)
+  alloy:
+    networks:
+      - telemetry
+    image: grafana/alloy:latest
+    container_name: alloy
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --storage.path=/var/lib/alloy/data
+      - --server.http.listen-addr=0.0.0.0:12345
+    ports:
+      - "12345:12345"
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy
+networks:
+  telemetry:

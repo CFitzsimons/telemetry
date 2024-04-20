@@ -1,0 +1,34 @@
+logging {
+  level  = "debug"
+  format = "logfmt"
+}
+
+otelcol.receiver.otlp "otlp_integrations_nodejs" {
+  http {}
+
+  output {
+    metrics = [otelcol.exporter.otlphttp.otlp_integrations_nodejs.input]
+    logs    = [otelcol.exporter.otlphttp.otlp_integrations_nodejs.input]
+    traces  = [otelcol.exporter.otlphttp.otlp_integrations_nodejs.input]
+  }
+}
+
+otelcol.exporter.otlphttp "otlp_integrations_nodejs" {
+  client {
+    endpoint = "http://mimir:9009/api/v1/push"
+  }
+}
+
+prometheus.remote_write "metrics_integrations_integrations_nodejs" {
+  endpoint {
+    url = "http://mimir:9009/api/v1/push"
+  }
+}
+
+prometheus.scrape "metrics_integrations_integrations_nodejs" {
+	targets = [{
+		__address__ = "host.docker.internal:3500",
+	}]
+	forward_to = [prometheus.remote_write.metrics_integrations_integrations_nodejs.receiver]
+	job_name   = "integrations/nodejs"
+}
