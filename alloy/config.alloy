@@ -15,8 +15,9 @@ otelcol.receiver.otlp "otlp_integrations_nodejs" {
 
 otelcol.exporter.otlphttp "otlp_integrations_nodejs" {
   client {
-    endpoint = "http://mimir:9009/api/v1/push"
+    endpoint = "http://mimir:9009"
   }
+  metrics_endpoint = "http://mimir:9009/otlp/v1/metrics"
 }
 
 prometheus.remote_write "metrics_integrations_integrations_nodejs" {
@@ -25,10 +26,10 @@ prometheus.remote_write "metrics_integrations_integrations_nodejs" {
   }
 }
 
-prometheus.scrape "metrics_integrations_integrations_nodejs" {
-	targets = [{
-		__address__ = "host.docker.internal:3500",
-	}]
-	forward_to = [prometheus.remote_write.metrics_integrations_integrations_nodejs.receiver]
-	job_name   = "integrations/nodejs"
-}
+// prometheus.scrape "metrics_integrations_integrations_nodejs" {
+// 	targets = [{
+// 		__address__ = "host.docker.internal:9000",
+// 	}]
+// 	forward_to = [prometheus.remote_write.metrics_integrations_integrations_nodejs.receiver]
+// 	job_name   = "integrations/nodejs"
+// }
