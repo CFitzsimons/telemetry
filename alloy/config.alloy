@@ -26,10 +26,10 @@ prometheus.remote_write "metrics_integrations_integrations_nodejs" {
   }
 }
 
-// prometheus.scrape "metrics_integrations_integrations_nodejs" {
-// 	targets = [{
-// 		__address__ = "host.docker.internal:9000",
-// 	}]
-// 	forward_to = [prometheus.remote_write.metrics_integrations_integrations_nodejs.receiver]
-// 	job_name   = "integrations/nodejs"
-// }
+prometheus.scrape "metrics_integrations_integrations_nodejs" {
+	targets = [{
+		__address__ = "host.docker.internal:9000",
+	}]
+	forward_to = [prometheus.remote_write.metrics_integrations_integrations_nodejs.receiver]
+	job_name   = "integrations/nodejs"
+}
